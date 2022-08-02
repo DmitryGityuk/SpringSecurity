@@ -1,20 +1,23 @@
 package com.example.security.configs;
 
+import com.example.security.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
-
-import javax.sql.DataSource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private UserService userService;
 
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -29,9 +32,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout().logoutSuccessUrl("/");
     }
 
-//    /**
-//     In Memory
-//     */
+    /**
+     In Memory
+     */
 //    @Bean
 //    public UserDetailsService users(){
 //        UserDetails user = User.builder()
@@ -50,8 +53,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * jdbc Authentication
      */
-    @Bean
-    public JdbcUserDetailsManager users(DataSource dataSource) {
+//    @Bean
+//    public JdbcUserDetailsManager users(DataSource dataSource) {
 //        UserDetails user = User.builder()
 //                .username("user")
 //                .password("{bcrypt}$2a$10$QRAhS0L4UdXP7dT/BAp1p.TrFRaEVfJuaFppHX1h7tj3kp5U66Zki")
@@ -62,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .password("{bcrypt}$2a$12$WUfsvqQyZIMqqD6iYvDRAOVSzxpga9pFpo92MekAhUOgPnhB4FG.W")
 //                .roles("ADMIN", "USER")
 //                .build();
-        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+//        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
 //        if (jdbcUserDetailsManager.userExists(user.getUsername())) {
 //            jdbcUserDetailsManager.deleteUser(user.getUsername());
 //        }
@@ -71,6 +74,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        }
 //        jdbcUserDetailsManager.createUser(user);
 //        jdbcUserDetailsManager.createUser(admin);
-        return jdbcUserDetailsManager;
+//        return jdbcUserDetailsManager;
+//    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        authenticationProvider.setUserDetailsService(userService);
+        return authenticationProvider;
     }
 }
