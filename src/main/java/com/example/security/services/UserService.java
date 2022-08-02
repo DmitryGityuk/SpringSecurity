@@ -4,6 +4,7 @@ import com.example.security.entities.Role;
 import com.example.security.entities.User;
 import com.example.security.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +31,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     @Transactional
+    @Secured("ADMIN")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = findByUsername(username);
         if (user == null) {
