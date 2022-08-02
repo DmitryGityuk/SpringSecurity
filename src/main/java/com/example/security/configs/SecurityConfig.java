@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserService userService;
 
@@ -30,6 +30,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .and()
                 .logout().logoutSuccessUrl("/");
+//                .and()
+//                .csrf().disable();
     }
 
     /**
